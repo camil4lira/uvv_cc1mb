@@ -1,0 +1,118 @@
+
+CREATE TABLE elmasri.funcionario1 (
+                cpf CHAR(11) NOT NULL,
+                primeiro_nome VARCHAR(15) NOT NULL,
+                nome_meio CHAR(1),
+                ultimo_nome VARCHAR(15) NOT NULL,
+                data_nascimento DATE,
+                endereco VARCHAR(30),
+                sexo CHAR(1),
+                salario NUMERIC(10,2),
+                numero_departamento INTEGER NOT NULL,
+                cpf_supervisor CHAR(11) NOT NULL,
+                CONSTRAINT funcionariopk PRIMARY KEY (cpf)
+);
+COMMENT ON TABLE elmasri.funcionario1 IS 'dados do funcionario';
+
+
+CREATE TABLE elmasri.departamento1 (
+                numero_departamento INTEGER NOT NULL,
+                nome_departamento VARCHAR(15) NOT NULL,
+                cpf_gerente CHAR(11) NOT NULL,
+                data_inicio_gerente DATE,
+                CONSTRAINT departamentopk PRIMARY KEY (numero_departamento)
+);
+COMMENT ON TABLE elmasri.departamento1 IS 'dados dos departamentos';
+
+
+CREATE TABLE elmasri.projeto1 (
+                numero_projeto INTEGER NOT NULL,
+                nome_projeto VARCHAR(15) NOT NULL,
+                local_projeto VARCHAR(15),
+                numero_departamento INTEGER NOT NULL,
+                CONSTRAINT projetopk PRIMARY KEY (numero_projeto)
+);
+COMMENT ON TABLE elmasri.projeto1 IS 'dados dos projetos';
+COMMENT ON COLUMN elmasri.projeto1.nome_projeto IS 'ak';
+
+
+CREATE UNIQUE INDEX projeto_idx
+ ON elmasri.projeto1
+ ( nome_projeto );
+
+CREATE TABLE elmasri.trabalha_em1 (
+                numero_projeto INTEGER NOT NULL,
+                cpf_funcionario CHAR(11) NOT NULL,
+                horas NUMERIC(3,1) NOT NULL,
+                CONSTRAINT trabalha_empk PRIMARY KEY (numero_projeto, cpf_funcionario)
+);
+COMMENT ON TABLE elmasri.trabalha_em1 IS 'tabela que armazena em qual projeto o funcionario trabalha';
+
+
+CREATE TABLE elmasri.localizacoes_departamento1 (
+                numero_departamento INTEGER NOT NULL,
+                local VARCHAR(15) NOT NULL,
+                CONSTRAINT localizacoes_departamentopk PRIMARY KEY (numero_departamento, local)
+);
+COMMENT ON TABLE elmasri.localizacoes_departamento1 IS 'localizacoes do departamento';
+
+
+CREATE TABLE elmasri.dependente1 (
+                cpf_funcionario CHAR(11) NOT NULL,
+                nome_dependente VARCHAR(15) NOT NULL,
+                sexo CHAR(1),
+                data_nascimento DATE,
+                parentesco VARCHAR(15),
+                CONSTRAINT dependentepk PRIMARY KEY (cpf_funcionario, nome_dependente)
+);
+COMMENT ON TABLE elmasri.dependente1 IS 'dependentes do funcionario';
+
+
+ALTER TABLE elmasri.dependente1 ADD CONSTRAINT funcionario_dependente_fk
+FOREIGN KEY (cpf_funcionario)
+REFERENCES elmasri.funcionario1 (cpf)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE elmasri.departamento1 ADD CONSTRAINT funcionario_departamento_fk
+FOREIGN KEY (cpf_gerente)
+REFERENCES elmasri.funcionario1 (cpf)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE elmasri.trabalha_em1 ADD CONSTRAINT funcionario_trabalha_em_fk
+FOREIGN KEY (cpf_funcionario)
+REFERENCES elmasri.funcionario1 (cpf)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE elmasri.funcionario1 ADD CONSTRAINT funcionario1_funcionario1_fk
+FOREIGN KEY (cpf_supervisor)
+REFERENCES elmasri.funcionario1 (cpf)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE elmasri.localizacoes_departamento1 ADD CONSTRAINT departamento_localizacoes_departamento_fk
+FOREIGN KEY (numero_departamento)
+REFERENCES elmasri.departamento1 (numero_departamento)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE elmasri.projeto1 ADD CONSTRAINT departamento_projeto_fk
+FOREIGN KEY (numero_departamento)
+REFERENCES elmasri.departamento1 (numero_departamento)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE elmasri.trabalha_em1 ADD CONSTRAINT projeto_trabalha_em_fk
+FOREIGN KEY (numero_projeto)
+REFERENCES elmasri.projeto1 (numero_projeto)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
